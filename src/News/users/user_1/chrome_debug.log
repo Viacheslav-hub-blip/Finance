@@ -1,0 +1,11 @@
+[16332:16908:0610/172651.501:WARNING:chrome_main_delegate.cc(742)] This is Chrome version 125.0.6422.142 (not a warning)
+[16332:16908:0610/172651.627:INFO:chrome_browser_cloud_management_controller.cc(168)] Starting CBCM Controller Initialization
+[16332:16908:0610/172651.627:INFO:chrome_browser_cloud_management_controller.cc(196)] No machine level policy manager exists.
+[16332:16908:0610/172651.676:WARNING:browser_management_service.cc(128)] EnterpriseLogoUrl fetch failed with error code -1 and MIME type 
+[17072:22804:0610/172651.856:INFO:cpu_info.cc(53)] Available number of cores: 8
+[21716:16044:0610/172651.856:INFO:cpu_info.cc(53)] Available number of cores: 8
+[20592:15184:0610/172652.193:INFO:cpu_info.cc(53)] Available number of cores: 8
+[18768:20536:0610/172652.435:INFO:cpu_info.cc(53)] Available number of cores: 8
+[11188:7348:0610/172652.552:ERROR:ssl_client_socket_impl.cc(879)] handshake failed; returned -1, SSL error code 1, net_error -101
+[11188:7348:0610/172652.588:ERROR:ssl_client_socket_impl.cc(879)] handshake failed; returned -1, SSL error code 1, net_error -101
+[6984:22888:0610/172652.702:INFO:cpu_info.cc(53)] Available number of cores: 8
