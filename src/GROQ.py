@@ -12,29 +12,23 @@ class Model():
         )
 
     def get_answer(self, content: str) -> str:
-        answer = ''
-        try:
-            chat = self.client.chat.completions.create(
-                messages=[
-                    {
-                        "role": "system",
-                        "content:": "You are a respectful, helpful and honest stock market analysis assistant. You should give a forecast of the stock market's reaction to events that occur in the world or with a certain company"
-                    },
-                    {
-                        "role": "user",
-                        "content": content
-                    }
-                ],
-                model="llama3-70b-8192"
-            )
+        chat = self.client.chat.completions.create(
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a respectful, helpful and honest stock market analysis assistant. You should give a forecast of the stock market's reaction to events that occur in the world or with a certain company"
+                },
+                {
+                    "role": "user",
+                    "content": content
+                }
+            ],
+            model="llama3-70b-8192"
+        )
 
-            answer  = chat.choices[0].message.content
-        except Exception as ex:
-            print('Ошибка получения ответа')
-
-        return answer
+        return chat.choices[0].message.content
 
 
 if __name__ == "__main__":
     model = Model("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")
-    print(model.get_answer('что может произойти после этого события: ' + m_m))
+    print(model.get_answer('что может произойти после этого события: '))

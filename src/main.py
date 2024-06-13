@@ -1,11 +1,12 @@
 import datetime
-
+import warnings
 from src.EventAnswerGenerators import AnswerGenerator, EventCreator
 from src.PeriodGetter import Period_Getter
 from CompanyStockPrice import get_data_company
 from src.JSONCreator import JSONLCreator
 
 if __name__ == '__main__':
+
     t1 = datetime.datetime.now()
     model_key = "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"
     # stock_data = {'2022-01-03': 180.33904722092433, '2022-01-04': 180.3982048932326, '2022-01-05': 177.6666794522193,
@@ -60,7 +61,7 @@ if __name__ == '__main__':
     event_generator = EventCreator(answer_dict)
     events = event_generator.get_events()
 
-    JSONLCreator = JSONLCreator(events, "train_APPL_decline.jsonl")
+    JSONLCreator = JSONLCreator(events, "train_APPL_decline_6.jsonl")
     JSONLCreator.create_jsonl_file()
     t2 = datetime.datetime.now()
     print(t2-t1)

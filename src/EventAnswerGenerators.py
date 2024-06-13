@@ -1,7 +1,7 @@
 from src.GROQ import Model
 from typing import NamedTuple
 import ast
-from PeriodGetter import Period_Getter,  Period
+from PeriodGetter import Period_Getter, Period
 
 
 class Event_Type(NamedTuple):
@@ -25,18 +25,18 @@ class EventCreator():
         """из словаря создаем массив Event"""
         Events = []
 
-        if len(Events) > 0:
-            for answer in answers_dict:
-                print(answer)
-                dict = answer[0]
-                try:
-                    ev = Event_Type(dict['COMPANY'], dict['EVENT'], dict['DESCRIPTION'], dict['CHANGE_STOCK_PRICE'],
-                                    dict['SEMANTIC'])
-                    Events.append(ev)
-                except:
-                    print("неправильный формат ответа")
+        for answer in answers_dict:
+            print(answer)
+            dict = answer[0]
+            try:
+                ev = Event_Type(dict['COMPANY'], dict['EVENT'], dict['DESCRIPTION'], dict['CHANGE_STOCK_PRICE'],
+                                dict['SEMANTIC'])
+                Events.append(ev)
+            except:
+                print("неправильный формат ответа")
 
         return Events
+
 
     def get_events(self) -> [Event_Type]:
         return self._create_events_from_dict(self.answers_dict)
@@ -66,29 +66,27 @@ class AnswerGenerator():
     def _parse_answer(self, answer: str) -> []:
         """Получает список ответов языковой модели и удаляет лишние слова, строки -> преобразует в сьроковый формат dict"""
         res = []
-        try:
-            answer = answer.replace("{", "*{")
-            answer = answer.replace("}", "}*")
-            #print('parse_answer', answer)
-            x = answer.split("*")
 
-            for i in x:
-                if i.startswith("{") and i.endswith("}"):
-                    res.append(i)
-        except Exception as ex:
-            print('ошибка обработки ответа модели в _parse_answer')
+        answer = answer.replace("{", "*{")
+        answer = answer.replace("}", "}*")
+        # print('parse_answer', answer)
+        x = answer.split("*")
+
+        for i in x:
+            if i.startswith("{") and i.endswith("}"):
+                res.append(i)
+
         return res
 
     def _get_dict_after_parse(self, parsed_answers: []) -> []:
         """Получает обработанный ответ языковой модели и преобразует в dict"""
         res_dict = []
-        try:
-            for i in parsed_answers:
-                result = ast.literal_eval(i)
-                res_dict.append(result)
-            #print('get_dict', res_dict)
-        except Exception as ex:
-            print('ошибка преобразования ответа в dict')
+        for i in parsed_answers:
+            result = ast.literal_eval(i)
+            res_dict.append(result)
+
+        # print('get_dict', res_dict)
+
         return res_dict
 
     def get_answers_on_periods(self) -> [{}]:
