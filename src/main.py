@@ -1,13 +1,39 @@
 import datetime
-import warnings
+
 from src.EventAnswerGenerators import AnswerGenerator, EventCreator
 from src.PeriodGetter import Period_Getter
-from CompanyStockPrice import get_data_company
+from src.CompanyStockPrice import get_data_company
 from src.JSONCreator import JSONLCreator
 
 if __name__ == '__main__':
-
     t1 = datetime.datetime.now()
+    compamies = [#'ORCL',
+                 #'TM',
+                 #'MCD',
+                 #'BA',
+                 # 'BK',
+                 # 'JPM',
+                 # 'BAC',
+                 # 'CVX',
+                 # 'DIS',
+                 # 'MS',
+                 # 'RY',
+                 # 'NKE',
+                 # 'AMZN',
+                 # 'META',
+                 # 'TSM',
+                 # 'V',
+                 # 'LLY',
+                 # 'SSNLF'
+                'KO',
+                'CSCO',
+                'UNH',
+                'HD',
+                'MA',
+                'ADBE',
+    ]
+    #company = 'TSLA'
+
     model_key = "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"
     # stock_data = {'2022-01-03': 180.33904722092433, '2022-01-04': 180.3982048932326, '2022-01-05': 177.6666794522193,
     #               '2022-01-06': 172.86432004724844, '2022-01-07': 171.7204462075955, '2022-01-10': 170.1032520387883,
@@ -50,18 +76,24 @@ if __name__ == '__main__':
     #               '2022-06-16': 130.90893145837705, '2022-06-17': 131.59119532254587, '2022-06-21': 135.52666510309132,
     #               '2022-06-22': 136.21888934724515, '2022-06-23': 137.03957206270437, '2022-06-24': 140.32244431749157,
     #               '2022-06-27': 141.8847550770621, '2022-06-28': 141.81554761684743, '2022-06-29': 139.0963173941443}
-    stock_data = get_data_company('AAPL', 180, '2022-01-01', 1)
 
-    period_getter = Period_Getter(stock_data, 6, 'AAPL')
-    decline_periods = period_getter.get_decline_periods()
+    for company in compamies:
+        t1_1 = datetime.datetime.now()
+        stock_data = get_data_company(company, 2160, '2017-01-01', 1)
 
-    answer_generator = AnswerGenerator(model_key, decline_periods)
-    answer_dict = answer_generator.get_answers_on_periods()
+        period_getter = Period_Getter(stock_data, 6, company)
+        decline_periods = period_getter.get_decline_periods()
 
-    event_generator = EventCreator(answer_dict)
-    events = event_generator.get_events()
+        answer_generator = AnswerGenerator(model_key, decline_periods)
+        answer_dict = answer_generator.get_answers_on_periods()
 
-    JSONLCreator = JSONLCreator(events, "train_APPL_decline_6.jsonl")
-    JSONLCreator.create_jsonl_file()
+        event_generator = EventCreator(answer_dict)
+        events = event_generator.get_events()
+
+        json = JSONLCreator(events, f"train_{company}_decline.jsonl")
+        json.create_jsonl_file()
+        t2_2 = datetime.datetime.now()
+        print('t', t2_2-t1_1)
+
     t2 = datetime.datetime.now()
-    print(t2-t1)
+    print(t2 - t1)

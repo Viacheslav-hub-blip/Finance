@@ -12,6 +12,8 @@ class Model():
         )
 
     def get_answer(self, content: str) -> str:
+        answer = ''
+
         chat = self.client.chat.completions.create(
             messages=[
                 {
@@ -26,9 +28,11 @@ class Model():
             model="llama3-70b-8192"
         )
 
-        return chat.choices[0].message.content
+        answer = chat.choices[0].message.content
+
+        return answer
 
 
 if __name__ == "__main__":
     model = Model("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")
-    print(model.get_answer('что может произойти после этого события: '))
+    print(model.get_answer('что может произойти после этого события: ' + m_m))

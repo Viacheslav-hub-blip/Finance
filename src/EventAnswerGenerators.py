@@ -1,7 +1,7 @@
 from src.GROQ import Model
 from typing import NamedTuple
 import ast
-from PeriodGetter import Period_Getter, Period
+from src.PeriodGetter import Period_Getter, Period
 
 
 class Event_Type(NamedTuple):
@@ -28,15 +28,17 @@ class EventCreator():
         for answer in answers_dict:
             print(answer)
             dict = answer[0]
+            ev = Event_Type('error', 'error', 'error', 'error', 'error')
             try:
-                ev = Event_Type(dict['COMPANY'], dict['EVENT'], dict['DESCRIPTION'], dict['CHANGE_STOCK_PRICE'],
+                ev = Event_Type(dict['COMPANY'], dict['EVENT'], dict['DESCRIPTION'],
+                                dict['CHANGE_STOCK_PRICE'],
                                 dict['SEMANTIC'])
-                Events.append(ev)
             except:
                 print("неправильный формат ответа")
 
-        return Events
+            Events.append(ev)
 
+        return Events
 
     def get_events(self) -> [Event_Type]:
         return self._create_events_from_dict(self.answers_dict)
@@ -57,7 +59,7 @@ class AnswerGenerator():
         """получает список обьектов Period и преобразует в список ответов языковой модели"""
         answers = []
         for i in decline_periods[1:]:
-            prompt = f'с чем свзяно падение акций компании <{i.company}> в период с <{i.start_date}> до <{i.end_date}> на {i.change}.ответь в формате JSON с полями COMPANY, EVENT(событие которое произошло), DESCRIPTION (наиболее полное описание события), CHANGE_STOCK_PRICE(в процентах), SEMANTIC(NEGATIVE OR POSITIVE).Учитывай только ближайшие события к данным датам. Не отвечайте в других форматах и не добавляйте слова за скобками'
+            prompt = f'с чем свзяно падение акций компании <{i.company}> в период с <{i.start_date}> до <{i.end_date}> на {i.change}.ответь в формате JSON с полями COMPANY, EVENT(событие которое произошло), DESCRIPTION (описание событий и последствия для компании, как это повлияет на развитие), CHANGE_STOCK_PRICE(в процентах), SEMANTIC(NEGATIVE OR POSITIVE).Учитывай только ближайшие события к данным датам. Не отвечайте в других форматах и не добавляйте слова за скобками'
             model = Model(key=self.model_key_api)
             answer = model.get_answer(prompt)
             answers.append(answer)

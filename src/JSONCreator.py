@@ -27,4 +27,7 @@ class JSONLCreator():
                          f"stock_price_change : {event.change_stock_price} " \
                          f"semantic: {event.semantic} " \
                          f"company: {event.company} "
-                json_writer.write({"text": format})
+                try:
+                    json_writer.write({"text": format})
+                except:
+                    print('ошибка записи в фаил')
