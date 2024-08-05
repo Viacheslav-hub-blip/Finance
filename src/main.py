@@ -7,32 +7,33 @@ from src.JSONCreator import JSONLCreator
 
 if __name__ == '__main__':
     t1 = datetime.datetime.now()
-    compamies = [#'ORCL',
-                 #'TM',
-                 #'MCD',
-                 #'BA',
-                 # 'BK',
-                 # 'JPM',
-                 # 'BAC',
-                 # 'CVX',
-                 # 'DIS',
-                 # 'MS',
-                 # 'RY',
-                 # 'NKE',
-                 # 'AMZN',
-                 # 'META',
-                 # 'TSM',
-                 # 'V',
-                 # 'LLY',
-                 # 'SSNLF'
-                'KO',
-                'CSCO',
-                'UNH',
-                'HD',
-                'MA',
-                'ADBE',
-    ]
-    #company = 'TSLA'
+    # compamies = [  # 'ORCL',
+    #     # 'TM',
+    #     # 'MCD',
+    #     # 'BA',
+    #     # 'BK',
+    #     # 'JPM',
+    #     # 'BAC',
+    #     # 'CVX',
+    #     # 'DIS',
+    #     # 'MS',
+    #     # 'RY',
+    #     # 'NKE',
+    #     # 'AMZN',
+    #     # 'META',
+    #     # 'TSM',
+    #     # 'V',
+    #     # 'LLY',
+    #     # 'SSNLF'
+    #     'KO',
+    #     'CSCO',
+    #     'UNH',
+    #     'HD',
+    #     'MA',
+    #     'ADBE',
+    # ]
+    # company = 'TSLA'
+    companies = ['TSLA']
 
     model_key = "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"
     # stock_data = {'2022-01-03': 180.33904722092433, '2022-01-04': 180.3982048932326, '2022-01-05': 177.6666794522193,
@@ -77,23 +78,27 @@ if __name__ == '__main__':
     #               '2022-06-22': 136.21888934724515, '2022-06-23': 137.03957206270437, '2022-06-24': 140.32244431749157,
     #               '2022-06-27': 141.8847550770621, '2022-06-28': 141.81554761684743, '2022-06-29': 139.0963173941443}
 
-    for company in compamies:
+    for company in companies:
         t1_1 = datetime.datetime.now()
         stock_data = get_data_company(company, 2160, '2017-01-01', 1)
 
         period_getter = Period_Getter(stock_data, 6, company)
-        decline_periods = period_getter.get_decline_periods()
+        # decline_periods = period_getter.get_decline_periods()
+        rise_periods = period_getter.get_rise_periods()
 
-        answer_generator = AnswerGenerator(model_key, decline_periods)
+        # prompt = 'с чем свзяно падение акций компании <{0}> в период с <{1}> до <{2}> на {3}.ответь в формате JSON с полями COMPANY, EVENT(событие которое произошло), DESCRIPTION (описание событий и последствия для компании, как это повлияет на развитие), CHANGE_STOCK_PRICE(в процентах), SEMANTIC(NEGATIVE OR POSITIVE).Учитывай только ближайшие события к данным датам. Не отвечайте в других форматах и не добавляйте слова за скобками'
+        prompt = 'с чем связан рост акций компании <{0}> в период с <{1}> до <{2}> на {3}.ответь в формате JSON с полями COMPANY, EVENT(событие которое произошло), DESCRIPTION (описание событий и последствия для компании, как это повлияет на развитие), CHANGE_STOCK_PRICE(в процентах), SEMANTIC(NEGATIVE OR POSITIVE).Учитывай только ближайшие события к данным датам. Не отвечайте в других форматах и не добавляйте слова за скобками'
+
+        answer_generator = AnswerGenerator(model_key, rise_periods, prompt)
         answer_dict = answer_generator.get_answers_on_periods()
 
         event_generator = EventCreator(answer_dict)
         events = event_generator.get_events()
 
-        json = JSONLCreator(events, f"train_{company}_decline.jsonl")
+        json = JSONLCreator(events, f"/rise/train_{company}_rise.jsonl")
         json.create_jsonl_file()
         t2_2 = datetime.datetime.now()
-        print('t', t2_2-t1_1)
+        print('t', t2_2 - t1_1)
 
     t2 = datetime.datetime.now()
     print(t2 - t1)

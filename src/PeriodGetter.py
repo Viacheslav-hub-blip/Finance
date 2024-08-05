@@ -14,15 +14,17 @@ class Period(NamedTuple):
 
 class Period_Getter():
     company: str
-    data:dict
+    data: dict
     change_perstange: int
 
     def __init__(self, data, change_percent, company):
         self.data = data
         self.change_perstange = change_percent
         self.company = company
+
     def _get_all_decline_periods(self, data: dict) -> []:
         '''получаем словарь всех дат и значений курса -> выбираем только промежутки падения'''
+        print('data in decline', data)
         all_decline = []
         current_decline = []
         values = list(data.values())
@@ -42,6 +44,27 @@ class Period_Getter():
         all_decline = [i for i in all_decline if len(i) > 1]
         return all_decline
 
+    def _get_all_rise_periods(self, data: dict) -> []:
+        '''получаем словарь всех дат и значений курса -> выбираем только промежутки РОСТА   '''
+        all_rise = []
+        current_rise = []
+        values = list(data.values())
+        keys = list(data.keys())
+        for i in range(len(data) - 1):
+            current_price = round(values[i])
+            current_key = keys[i]
+            next_price = round(values[i + 1])
+            res = f'{current_key}:{current_price}'
+
+            if current_price < next_price:
+                current_rise.append(res)
+            else:
+                current_rise.append(res)
+                all_rise.append(current_rise)
+                current_rise = []
+        all_rise = [i for i in all_rise if len(i) > 1]
+        return all_rise
+
     def _get_high_change_decline(self, all_decline: [], change_percent: int) -> []:
         """Получаем список всех периодов падения и выбираем только те периоды у которых начальное значения больше конечного на определенный процент"""
         for i in range(len(all_decline)):
@@ -52,6 +75,17 @@ class Period_Getter():
                 all_decline[i] = []
         all_decline = [i for i in all_decline if len(i) > 1]
         return all_decline
+
+    def _get_high_change_rise(self, all_rise: [], change_percent: int) -> []:
+        """Получаем список всех периодов роста и выбираем только те периоды у которых начальное значения меньше конечного на определенный процент"""
+        for i in range(len(all_rise)):
+            first_value = int(all_rise[i][0].split(':')[1])
+            last_value = int(all_rise[i][-1].split(':')[1])
+
+            if (1 - first_value / last_value) * 100 < change_percent:
+                all_rise[i] = []
+        all_rise = [i for i in all_rise if len(i) > 1]
+        return all_rise
 
     def _convert_decline_list_to_Periods_list(self, all_decline: []) -> [Period]:
         """получаем список периодов спада и преобразуем к новому типу данных"""
@@ -67,8 +101,28 @@ class Period_Getter():
             decline_periods_with_percent.append(new_period)
         return decline_periods_with_percent
 
+    def _convert_rise_list_to_Periods_list(self, all_rise: []) -> [Period]:
+        """получаем список периодов роста и преобразуем к новому типу данных"""
+        rise_periods_with_percent = [Period]
+        for i in all_rise:
+            start_date = datetime.datetime.strptime(i[0].split(':')[0], '%Y-%m-%d')
+            end_date = datetime.datetime.strptime(i[-1].split(':')[0], '%Y-%m-%d')
+            start_value = int(i[0].split(':')[1])
+            end_value = int(i[-1].split(':')[1])
+            change = (1 - start_value / end_value) * 100
+            days = abs((start_date - end_date).days)
+            new_period = Period(self.company, start_date, end_date, start_value, end_value, change, days)
+            rise_periods_with_percent.append(new_period)
+        return rise_periods_with_percent
+
     def get_decline_periods(self) -> [Period]:
-        return self._convert_decline_list_to_Periods_list(self._get_high_change_decline(self._get_all_decline_periods(self.data), self.change_perstange))
+        return self._convert_decline_list_to_Periods_list(
+            self._get_high_change_decline(self._get_all_decline_periods(self.data), self.change_perstange))
+
+    def get_rise_periods(self) -> [Period]:
+        return self._convert_rise_list_to_Periods_list(
+            self._get_high_change_rise(self._get_all_rise_periods(self.data), self.change_perstange))
+
 
 
 if __name__ == '__main__':

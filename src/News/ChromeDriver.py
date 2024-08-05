@@ -19,7 +19,6 @@ class ChromeDriver:
         self.driver.get(url)
 
     def find_elements_by_class_name(self, class_names: [str]) -> [uc.webelement]:
-        ''''''
         all_elements = []
 
         for class_name in class_names:
@@ -60,8 +59,8 @@ def _get_pages_contents(driver, links, class_names) -> [Page]:
 def get_pages_from_Bloomberg(main_url: str, names_classes_web_elements: [str]) -> [Page]:
     options = uc.ChromeOptions()
     options.add_argument('--blink-settings=imagesEnabled=false')
-
     chrome_driver = ChromeDriver(options)
+
     chrome_driver.set_current_page(main_url)
 
     elements_with_links = chrome_driver.find_elements_by_class_name(['thumbnailWrapper__23c201ad78'])
@@ -89,17 +88,25 @@ if __name__ == '__main__':
 
     t1 = datetime.datetime.now()
 
+    #опции для бразузера
     options = uc.ChromeOptions()
     options.add_argument('--blink-settings=imagesEnabled=false')
 
+    #создаем броаузер
     chrome_driver = ChromeDriver(options)
+    #начальная страница
     chrome_driver.set_current_page('https://www.bloomberg.com/search?query=Tesla')
 
+    #элементы на начальной странице, которые содержат ссылки
     elements_with_links = chrome_driver.find_elements_by_class_name(['thumbnailWrapper__23c201ad78'])
 
+    #получаем ссылки из элементов
     links = _get_links_from_web_elements(elements_with_links)
+
+    #элементы в которых находится текст страниц
     class_names = ['media-ui-Paragraph_text-SqIsdNjh0t0-', 'media-ui-Paragraph_text-SqIsdNjh0t0- paywall']
 
+    #получаем текст со страниц, первые 2 ссылки(для примера)
     for page in _get_pages_contents(chrome_driver, links[:2], class_names):
         print(page)
 

@@ -18,7 +18,7 @@ class Model():
             messages=[
                 {
                     "role": "system",
-                    "content": "You are a respectful, helpful and honest stock market analysis assistant. You should give a forecast of the stock market's reaction to events that occur in the world or with a certain company"
+                    "content": "As a factual stock market analyst, I can provide insights into the impact of significant events on the performance of stocks. I will base my analysis solely on real-world data and credible sources to deliver accurate explanations for stock price fluctuations."
                 },
                 {
                     "role": "user",
@@ -34,5 +34,6 @@ class Model():
 
 
 if __name__ == "__main__":
+    # ВКЛЮЧИТЬ VPN!!!!!!!!!!!!!!!!!!
     model = Model("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")
-    print(model.get_answer('что может произойти после этого события: ' + m_m))
+    print(model.get_answer('что может произойти после этого события: '))

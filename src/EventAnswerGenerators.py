@@ -16,7 +16,6 @@ class EventCreator():
     ''''
     создает список обьектов Event из словаря ответов языковой модели
     '''
-    answers_dict: [{}]
 
     def __init__(self, answers_dict):
         self.answers_dict = answers_dict
@@ -49,19 +48,21 @@ class AnswerGenerator():
     Получает периоды изменения курса акций -> возвращает список с ответами модели(обьяснение изменения)
     '''
     model_key_api: str
-    decline_periods: []
+    periods: []
+    question: str
 
-    def __init__(self, model_key_api, delcine_periods):
+    def __init__(self, model_key_api, periods, prompt):
         self.model_key_api = model_key_api
-        self.decline_periods = delcine_periods
+        self.periods = periods
+        self.question = prompt
 
     def _get_answer_for_decline_period(self, decline_periods: [Period]) -> []:
         """получает список обьектов Period и преобразует в список ответов языковой модели"""
         answers = []
         for i in decline_periods[1:]:
-            prompt = f'с чем свзяно падение акций компании <{i.company}> в период с <{i.start_date}> до <{i.end_date}> на {i.change}.ответь в формате JSON с полями COMPANY, EVENT(событие которое произошло), DESCRIPTION (описание событий и последствия для компании, как это повлияет на развитие), CHANGE_STOCK_PRICE(в процентах), SEMANTIC(NEGATIVE OR POSITIVE).Учитывай только ближайшие события к данным датам. Не отвечайте в других форматах и не добавляйте слова за скобками'
+            question = self.question.format(i.company, i.start_date, i.end_date, i.change)
             model = Model(key=self.model_key_api)
-            answer = model.get_answer(prompt)
+            answer = model.get_answer(question)
             answers.append(answer)
         return answers
 
@@ -92,7 +93,7 @@ class AnswerGenerator():
         return res_dict
 
     def get_answers_on_periods(self) -> [{}]:
-        answers = self._get_answer_for_decline_period(self.decline_periods)
+        answers = self._get_answer_for_decline_period(self.periods)
         answers_dicts = []
         for answer in answers:
             parsed_answer = self._parse_answer(answer)
@@ -102,6 +103,7 @@ class AnswerGenerator():
 
 
 if __name__ == "__main__":
+    # ВКЛЮЧИТЬ VPN!!!!!!!!!!!!!!!!!!
     s = "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"
     ar_data = {'2022-01-03': 180.33904722092433, '2022-01-04': 180.3982048932326, '2022-01-05': 177.6666794522193,
                '2022-01-06': 172.86432004724844, '2022-01-07': 171.7204462075955, '2022-01-10': 170.1032520387883,
@@ -145,14 +147,28 @@ if __name__ == "__main__":
                '2022-06-22': 136.21888934724515, '2022-06-23': 137.03957206270437, '2022-06-24': 140.32244431749157,
                '2022-06-27': 141.8847550770621, '2022-06-28': 141.81554761684743, '2022-06-29': 139.0963173941443}
 
-    period_getter = Period_Getter(ar_data, 6, 'APPLE')
+    period_getter = Period_Getter(ar_data, 6, 'APPL')
+
     decline_periods = period_getter.get_decline_periods()
+    rise_period = period_getter.get_rise_periods()
 
-    answer_generator = AnswerGenerator(s, decline_periods)
-    answer_dict = answer_generator.get_answers_on_periods()
+    print('decline', decline_periods)
+    print('rise', rise_period)
 
-    event_generator = EventCreator(answer_dict)
-    events = event_generator.get_events()
+    prompt_decline = 'What is the reason for the fall in the company shares <{0}> in the period from <{1}> to <{2}> by {3}?Answer in JSON format with the fields COMPANY, EVENT (the event that occurred), DESCRIPTION (how it affected the development of the company), CHANGE_STOCK_PRICE (as a percentage), SEMANTIC(NEGATIVE OR POSITIVE).Take into account only the nearest events to these dates. Do not respond in other formats and do not add words in parentheses.'
+    prompt_rise = 'What is the reason for the growth of the companys shares <{0}> in the period from <{1}> to <{2}> by {3}?Answer in JSON format with the fields COMPANY, EVENT (the event that occurred), DESCRIPTION (how it affected the development of the company), CHANGE_STOCK_PRICE (as a percentage), SEMANTIC(NEGATIVE OR POSITIVE).Take into account only the nearest events to these dates. Do not respond in other formats and do not add words in parentheses.'
 
-    for event in events:
-        print(event)
+    answer_generator_decline = AnswerGenerator(s, decline_periods, prompt_decline)
+    answer_decline_dict = answer_generator_decline.get_answers_on_periods()
+
+    print('decline answer', answer_generator_decline)
+
+    answer_generator_rise = AnswerGenerator(s, rise_period, prompt_rise)
+    answer_rise_dict = answer_generator_rise.get_answers_on_periods()
+
+    print('rise answer', answer_generator_rise)
+
+    all_answers = [answer_decline_dict, answer_rise_dict]
+
+    for ans in all_answers:
+        print(ans)

@@ -21,12 +21,13 @@ class JSONLCreator():
         with open(self.output_file, 'w') as output_file:
             json_writer = jsonlines.Writer(output_file)
             for event in self.events:
-                format = f"<s>[INST] <<SYS>> You are a respectful, helpful and honest stock market analysis assistant. You should give a forecast of the stock market's reaction to events that occur in the world or with a certain company. <</SYS>>" \
+                format = f"<s>[INST] <<SYS>> You are a respectful, helpful and honest stock market analysis assistant. You should give a forecast of the stock market's reaction to events that occur in the world or with a certain company. Think step by step<</SYS>>" \
                          f" {self.variable_answer[random.randint(0, len(self.variable_answer) - 1)]} {event.event} with company {event.company}? [/INST] " \
                          f"{event.description} " \
                          f"stock_price_change : {event.change_stock_price} " \
                          f"semantic: {event.semantic} " \
-                         f"company: {event.company} "
+                         f"company: {event.company} " \
+                         f"</s>"
                 try:
                     json_writer.write({"text": format})
                 except:
