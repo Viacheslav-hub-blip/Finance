@@ -56,10 +56,10 @@ class AnswerGenerator():
         self.periods = periods
         self.question = prompt
 
-    def _get_answer_for_decline_period(self, decline_periods: [Period]) -> []:
+    def _get_answer_on_periods(self, all_periods: [Period]) -> []:
         """получает список обьектов Period и преобразует в список ответов языковой модели"""
         answers = []
-        for i in decline_periods[1:]:
+        for i in all_periods:
             question = self.question.format(i.company, i.start_date, i.end_date, i.change)
             model = Model(key=self.model_key_api)
             answer = model.get_answer(question)
@@ -72,13 +72,15 @@ class AnswerGenerator():
 
         answer = answer.replace("{", "*{")
         answer = answer.replace("}", "}*")
-        # print('parse_answer', answer)
+        print('parse_answer', answer)
         x = answer.split("*")
+        print('x', x)
 
         for i in x:
             if i.startswith("{") and i.endswith("}"):
                 res.append(i)
 
+        print('res', res)
         return res
 
     def _get_dict_after_parse(self, parsed_answers: []) -> []:
@@ -88,12 +90,12 @@ class AnswerGenerator():
             result = ast.literal_eval(i)
             res_dict.append(result)
 
-        # print('get_dict', res_dict)
+        print('get_dict', res_dict)
 
         return res_dict
 
     def get_answers_on_periods(self) -> [{}]:
-        answers = self._get_answer_for_decline_period(self.periods)
+        answers = self._get_answer_on_periods(self.periods)
         answers_dicts = []
         for answer in answers:
             parsed_answer = self._parse_answer(answer)
